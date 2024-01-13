@@ -1,4 +1,4 @@
-import flatpickr from 'flatpickr';
+import flatpickr from "flatpickr";
 import iziToast from 'izitoast';
 
 const dataTimePicker = document.getElementById('datetime-picker');
