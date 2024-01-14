@@ -1,63 +1,43 @@
 import iziToast from 'izitoast';
-
+import 'izitoast/dist/css/iziToast.min.css';
 const form = document.querySelector('.form');
 
-form.addEventListener('submit', event => {
+form.addEventListener('submit', function (event) {
   event.preventDefault();
 
-  const time = form.elements.delay.value;
-  const state = form.elements.state.value;
+  const delayInput = form.querySelector('input[name="delay"]');
+  const stateInputs = form.querySelectorAll('input[name="state"]');
+  const selectedState = Array.from(stateInputs).find(input => input.checked);
 
-  // if (time < 0) {
-  //   iziToast.show({
-  //     icon: 'icon-false',
-  //     backgroundColor: '#FC5A5A',
-  //     message: `Delay cannot be negative`,
-  //     messageColor: '#FAFAFB',
-  //     messageSize: '16px',
-  //     position: 'topCenter',
-  //     close: false,
-  //     closeOnClick: true,
-  //   });
-  //   return;
-  // }
-
-  function promise() {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (state === 'fulfilled') {
-          resolve();
-        }
-        reject();
-      }, time);
-    });
+  if (!delayInput || !selectedState) {
+    console.error('Invalid form input');
+    return;
   }
 
-  promise()
-    .then(value => successfulMessage(time))
-    .catch(error => errorMessage(time));
+  const delay = parseInt(delayInput.value, 10);
+
+  const promise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (selectedState.value === 'fulfilled') {
+        resolve(delay);
+      } else {
+        reject(delay);
+      }
+    }, delay);
+  });
+
+  promise.then(
+    result => {
+      iziToast.success({
+        title: 'Success',
+        message: `Fulfilled promise in ${result}ms`,
+      });
+    },
+    result => {
+      iziToast.error({
+        title: 'Error',
+        message: `Rejected promise in ${result}ms`,
+      });
+    }
+  );
 });
-
-function errorMessage(delay) {
-  iziToast.show({
-    icon: 'icon-false',
-    backgroundColor: '#FC5A5A',
-    message: `Rejected promise in ${delay} ms`,
-    messageColor: '#FAFAFB',
-    messageSize: '16px',
-    position: 'topCenter',
-    close: false,
-  });
-}
-
-function successfulMessage(delay) {
-  iziToast.show({
-    icon: 'icon-false',
-    backgroundColor: '#82C43C',
-    message: `Fulfilled promise in ${delay} ms`,
-    messageColor: '#FAFAFB',
-    messageSize: '16px',
-    position: 'topCenter',
-    close: false,
-  });
-}
