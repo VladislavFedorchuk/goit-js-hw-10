@@ -6,24 +6,30 @@ import 'izitoast/dist/css/iziToast.min.css';
 const options = {
   enableTime: true,
   time_24hr: true,
-  defaultDate: new Date(),
   minuteIncrement: 1,
   onOpen(selectedDates, dateStr, instance) {
-    instance.clear(); 
+    if (!selectedDates.length) {
+      instance.setDate(new Date());
+    }
   },
   onClose(selectedDates) {
     const userSelectedDate = selectedDates[0];
     const now = new Date();
 
-    if (userSelectedDate <= now) {
-      iziToast.error({
-        title: 'Error',
-        message: 'Please choose a date in the future',
-      });
-      document.querySelector('[data-start]').disabled = true;
-    } else {
-      iziToast.hide();
+    if (userSelectedDate >= now) {
       document.querySelector('[data-start]').disabled = false;
+    } else {
+      document.querySelector('[data-start]').disabled = true;
+    }
+  },
+  onFocus(selectedDates, dateStr, instance) {
+    const userSelectedDate = selectedDates[0];
+    const now = new Date();
+
+    if (userSelectedDate >= now) {
+      document.querySelector('[data-start]').disabled = false;
+    } else {
+      document.querySelector('[data-start]').disabled = true;
     }
   },
 };
